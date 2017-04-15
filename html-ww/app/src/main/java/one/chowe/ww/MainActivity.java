@@ -15,29 +15,33 @@ import android.net.NetworkInfo.State;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+import java.util.Set;
+import android.util.Log;
 
 public class MainActivity extends AppCompatActivity {
     private TextView v;
     private Handler handler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         v=new TextView(this);
         v.setGravity(Gravity.CENTER);
         v.setTextSize(18);
-        String str="10086";
         new Thread(){
+
             @Override
             public void run() {
                 super.run();
                 Message msg=new Message();
-                String str="Hello World!";
-                Document doc;
+                String tag="";
                 String host = android.net.Proxy.getDefaultHost();
                 int port = android.net.Proxy.getDefaultPort();
                 if (host != null && port != -1) {
@@ -46,16 +50,22 @@ public class MainActivity extends AppCompatActivity {
                     System.setProperty("http.proxyPort", Integer.toString(port));
                 }
                 try {
-                    doc = Jsoup.connect("http://chowe.one/ww.html").timeout(5000).get();
-                    //Elements ele=doc.getElementsByTag("p");
-                    //str=doc.head().getElementsByTag("title").text();
-                    str=doc.body().getElementsByTag("p").text();
+                    Document doc = Jsoup.connect("http://chowe.one/ww.html").timeout(5000).get();
+
+                    Elements elements=doc.body().getElementsByTag("p");
+                    for(Element e:elements)
+                    {
+                        tag+=e.text();
+                        tag+="\n";
+                    }
+
+
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
-                msg.obj=(Object) str;
+                msg.obj=(Object)tag;
                 handler.sendMessage(msg);
             }
         }.start();
@@ -73,19 +83,3 @@ public class MainActivity extends AppCompatActivity {
 
 
 }
-
-
-/*
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
- */
